@@ -140,7 +140,6 @@ def parse_xy(contents):
     """
     Parse the contents of an uploaded .xy file.
     """
-    from io import StringIO
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     s = StringIO(decoded.decode('utf-8'))
@@ -152,7 +151,6 @@ def parse_cif(contents):
     """
     Parse the contents of an uploaded .cif file and return a pymatgen Structure object.
     """
-    from io import StringIO
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     s = StringIO(decoded.decode('utf-8'))

@@ -107,6 +107,7 @@ def update_lattice_parameters(selected_cif, scale_value, cif_data):
     if not selected_cif or cif_data is None:
         return no_update, no_update, no_update, no_update, no_update, no_update, 0
     try:
+        # Here we assume a single file for parameter adjustment.
         structure = parse_cif(cif_data[selected_cif])
         structure = normalize_structure(structure)
     except Exception as e:
@@ -121,11 +122,13 @@ def update_lattice_parameters(selected_cif, scale_value, cif_data):
                 lattice.alpha, lattice.beta, lattice.gamma, scale_value)
     return lattice.a, lattice.b, lattice.c, lattice.alpha, lattice.beta, lattice.gamma, scale_value or 0
 
+
+
 # ------------------------------------------------------------------
 # XRD Plot, Download Link, and CIF Summary Callbacks
 # ------------------------------------------------------------------
 
-# Callback to update the XRD plot.
+# Modified callback to update the XRD plot to support multiple CIF files.
 @app.callback(
     Output("xrd-plot", "figure"),
     [Input("cif-selector", "value"),
@@ -144,48 +147,64 @@ def update_lattice_parameters(selected_cif, scale_value, cif_data):
 def update_xrd_plot(selected_cif, a, b, c, alpha, beta, gamma, scaling, background, opacity, xy_data, cif_data):
     if not selected_cif or cif_data is None:
         return {}
-    try:
-        # Parse the selected CIF file.
-        structure = parse_cif(cif_data[selected_cif])
-        structure = normalize_structure(structure)
-        # Create a new lattice using the updated parameters.
-        new_lattice = structure.lattice.from_parameters(
-            a or structure.lattice.a,
-            b or structure.lattice.b,
-            c or structure.lattice.c,
-            alpha or structure.lattice.alpha,
-            beta or structure.lattice.beta,
-            gamma or structure.lattice.gamma
-        )
-        new_structure = Structure(new_lattice, structure.species, structure.frac_coords)
-    except Exception as e:
-        print("Error in update_xrd_plot while parsing structure:", e)
-        return {}
+    # Ensure selected_cif is a list for iteration.
+    if not isinstance(selected_cif, list):
+        selected_cif = [selected_cif]
+    
+    patterns = []
+    titles = []
+    
+    for cif_name in selected_cif:
+        try:
+            structure = parse_cif(cif_data[cif_name])
+            structure = normalize_structure(structure)
+            # Create a new lattice using the global input parameters.
+            new_lattice = structure.lattice.from_parameters(
+                a or structure.lattice.a,
+                b or structure.lattice.b,
+                c or structure.lattice.c,
+                alpha or structure.lattice.alpha,
+                beta or structure.lattice.beta,
+                gamma or structure.lattice.gamma
+            )
+            new_structure = Structure(new_lattice, structure.species, structure.frac_coords)
+        except Exception as e:
+            print("Error in update_xrd_plot while parsing structure for", cif_name, ":", e)
+            continue
 
-    # Calculate the XRD pattern.
-    calculator = XRDCalculator(wavelength="CuKa")
-    try:
-        pattern = calculator.get_pattern(new_structure, two_theta_range=(10, 120))
-    except Exception as e:
-        print("Error in XRD calculation:", e)
-        return {}
+        # Calculate the XRD pattern.
+        calculator = XRDCalculator(wavelength="CuKa")
+        try:
+            pattern = calculator.get_pattern(new_structure, two_theta_range=(10, 120))
+        except Exception as e:
+            print("Error in XRD calculation for", cif_name, ":", e)
+            continue
 
-    # Apply intensity scaling.
-    if scaling is not None and scaling != 100:
-        pattern.y = [val * (scaling / 100) for val in pattern.y]
+        # Apply intensity scaling.
+        if scaling is not None and scaling != 100:
+            pattern.y = [val * (scaling / 100) for val in pattern.y]
 
-    # Add background level.
-    if background is not None and background > 0:
-        pattern.y = [val + background for val in pattern.y]
+        # Add background level.
+        if background is not None and background > 0:
+            pattern.y = [val + background for val in pattern.y]
 
+        patterns.append(pattern)
+        titles.append(cif_name)
+    
     # Read experimental data if provided.
     exp_data = None
     if xy_data is not None:
         exp_data = pd.read_json(xy_data, orient='split')
-
-    # Generate the figure.
-    fig = plot_xrd([pattern], [selected_cif], "CuKa", experimental_data=exp_data, opacity=opacity)
-    max_y = max(pattern.y) if len(pattern.y) > 0 else 100
+    
+    # Generate the figure using all patterns.
+    fig = plot_xrd(patterns, titles, "CuKa", experimental_data=exp_data, opacity=opacity)
+    
+    # Adjust y-axis range.
+    max_y_list = []
+    for pattern in patterns:
+        if len(pattern.y) > 0:
+            max_y_list.append(max(pattern.y))
+    max_y = max(max_y_list) if max_y_list else 100
     fig.update_layout(
         yaxis=dict(
             range=[0, max(105, max_y + 5)],
@@ -244,7 +263,8 @@ def show_cif_summary(n_clicks, selected_cif, cif_data):
     if not selected_cif or n_clicks == 0 or cif_data is None:
         return ""
     try:
-        structure = parse_cif(cif_data[selected_cif])
+        # For summary, show the first selected file.
+        structure = parse_cif(cif_data[selected_cif[0]] if isinstance(selected_cif, list) else cif_data[selected_cif])
         structure = normalize_structure(structure)
     except Exception as e:
         print("Error in showing CIF summary:", e)
