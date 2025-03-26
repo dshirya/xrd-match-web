@@ -208,8 +208,8 @@ def update_download_link(figure):
         import plotly.io as pio
         fig = go.Figure(figure)
         fig.update_layout(
-            width=1200,
-            height=800,
+            width=1800,
+            height=400,
             paper_bgcolor='white',
             plot_bgcolor='white',
             font=dict(size=14),
@@ -222,8 +222,8 @@ def update_download_link(figure):
             format="png",
             scale=2,
             engine="kaleido",
-            width=1200,
-            height=800,
+            width=1800,
+            height=400,
             validate=False
         )
         b64_str = base64.b64encode(img_bytes).decode("ascii")
