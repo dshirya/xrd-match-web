@@ -5,56 +5,79 @@ from dash import html, dcc
 app = dash.Dash(__name__)
 server = app.server
 
+upload_style = {
+    'height': '60px',
+    'lineHeight': '60px',
+    'borderWidth': '1px',
+    'borderStyle': 'dashed',
+    'borderRadius': '5px',
+    'margin': '10px auto',
+    'backgroundColor': 'lightgrey',
+    'display': 'flex',
+    'justifyContent': 'center',
+    'alignItems': 'center'
+}
+
 app.layout = html.Div(
     style={"fontFamily": "Dejavu Sans", "fontSize": "16px"},  # Global font style for all text.
     children=[
         html.H1("XRD Pattern Customizer", style={"fontSize": "32px"}),
 
-        # File Upload Section
+        # File Upload Section with specified width percentages:
         html.Div([
+            # .xy File Upload (45% drop field)
             html.Div([
-                html.Div([
-                    html.H3("Upload .xy File", style={"fontSize": "24px"}),
-                    dcc.Upload(
-                        id="upload-xy",
-                        children=html.Div("Drag and drop or click to select a .xy file"),
-                        multiple=False,
-                        accept=".xy",
-                        style={
-                            "border": "1px dashed #ccc",
-                            "padding": "10px",
-                            "cursor": "pointer"
-                        }
-                    ),
-                    # Span for check mark status when .xy file is uploaded
-                    html.Span(id="xy-upload-status", style={
+                html.H3("Upload .xy File", style={"fontSize": "20px", "marginBottom": "5px", "textAlign": "center"}),
+                dcc.Upload(
+                    id="upload-xy",
+                    children=html.Div("Drop a .xy file or click to select "),
+                    multiple=False,
+                    accept=".xy",
+                    style=upload_style
+                )
+            ], style={"width": "45%", "display": "inline-block", "verticalAlign": "top"}),
+
+            # Tick mark for .xy file (5%)
+            html.Div([
+                html.Span(
+                    id="xy-upload-status",
+                    style={
                         "margin-left": "10px",
                         "color": "green",
-                        "fontSize": "24px"
-                    })
-                ], style={"flex": "1", "margin-right": "10px"}),
-                html.Div([
-                    html.H3("Upload .cif Files", style={"fontSize": "24px"}),
-                    dcc.Upload(
-                        id="upload-cif",
-                        children=html.Div("Drag and drop or click to select one or more .cif files"),
-                        multiple=True,  # Enables multiple file uploads
-                        accept=".cif",
-                        style={
-                            "border": "1px dashed #ccc",
-                            "padding": "10px",
-                            "cursor": "pointer"
-                        }
-                    ),
-                    # Span for displaying a check mark when at least one .cif file is uploaded.
-                    html.Span(id="cif-upload-status", style={
+                        "fontSize": "24px",
+                        "position": "relative",
+                        "textAlign": "center",
+                        "left": "20px",  # Adjust this value to move the tick mark right
+                        "top": "20px"  # Adjust this value to move the tick mark lower
+                    }
+                )
+            ], style={"width": "5%", "display": "inline-block", "verticalAlign": "middle"}),
+
+            # .cif File Upload (45% drop field)
+            html.Div([
+                html.H3("Upload .cif Files", style={"fontSize": "20px", "marginBottom": "5px", "textAlign": "center"}),
+                dcc.Upload(
+                    id="upload-cif",
+                    children=html.Div("Drop one or more .cif files or click to select"),
+                    multiple=True,  # Enables multiple file uploads
+                    accept=".cif",
+                    style=upload_style
+                )
+            ], style={"width": "45%", "display": "inline-block", "verticalAlign": "top"}),
+
+            # Tick mark for .cif file (5%)
+            html.Div([
+                html.Span(id="cif-upload-status", style={
                         "margin-left": "10px",
                         "color": "green",
-                        "fontSize": "24px"
-                    })
-                ], style={"flex": "1", "margin-left": "10px"})
-            ], style={"display": "flex", "flexDirection": "row", "alignItems": "center"})
-        ], style={"margin-bottom": "20px"}),
+                        "fontSize": "24px",
+                        "position": "relative",
+                        "textAlign": "center",
+                        "left": "20px",  # Adjust this value to move the tick mark right
+                        "top": "20px"
+                })
+            ], style={"width": "5%", "display": "inline-block", "verticalAlign": "middle"})
+        ], style={"width": "100%", "display": "flex", "alignItems": "center", "marginBottom": "20px"}),
 
         # Dropdown to select a CIF file (populated after upload)
         html.Div([

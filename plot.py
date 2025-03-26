@@ -91,11 +91,11 @@ def plot_xrd(patterns, titles, wavelength, experimental_data=None, opacity=0.9):
     fig.update_layout(
         title=dict(
             text=f"XRD Patterns (Wavelength: {wavelength})",
-            font=dict(family="Dejavu Sans", size=41)
+            font=dict(family="Dejavu Sans", size=30)
         ),
-        font=dict(family="Dejavu Sans", size=27),
+        font=dict(family="Dejavu Sans", size=24),
         xaxis=dict(
-            title=dict(text="2θ (degrees)", font=dict(family="Dejavu Sans", size=27)),
+            title=dict(text="2θ (degrees)", font=dict(family="Dejavu Sans", size=24)),
             range=[x_min, x_max],
             tickmode='array',
             tickvals=big_ticks,
@@ -106,11 +106,11 @@ def plot_xrd(patterns, titles, wavelength, experimental_data=None, opacity=0.9):
             zeroline=False
         ),
         yaxis=dict(
-            title=dict(text="Intensity", font=dict(family="Dejavu Sans", size=27)),
+            title=dict(text="Intensity", font=dict(family="Dejavu Sans", size=24)),
             range=[0, 105],
             gridcolor='lightgray',
             gridwidth=1,
-            tickfont=dict(family="Dejavu Sans", size=27)
+            tickfont=dict(family="Dejavu Sans", size=24)
         ),
         shapes=tick_shapes,
         template="plotly_white",
