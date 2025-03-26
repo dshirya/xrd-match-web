@@ -37,7 +37,7 @@ app.layout = html.Div([
                 dcc.Upload(
                     id="upload-cif",
                     children=html.Div("Drag and drop or click to select one or more .cif files"),
-                    multiple=True,
+                    multiple=True,  # Enables multiple file uploads
                     accept=".cif",
                     style={
                         "border": "1px dashed #ccc",
@@ -45,7 +45,7 @@ app.layout = html.Div([
                         "cursor": "pointer"
                     }
                 ),
-                # Span for check mark status when at least one .cif file is uploaded
+                # Span for displaying a check mark when at least one .cif file is uploaded.
                 html.Span(id="cif-upload-status", style={
                     "margin-left": "10px",
                     "color": "green",
