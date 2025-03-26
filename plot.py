@@ -95,7 +95,7 @@ def plot_xrd(patterns, titles, wavelength, experimental_data=None, opacity=0.9):
         ),
         font=dict(family="Dejavu Sans", size=24),
         xaxis=dict(
-            title=dict(text="2θ (degrees)", font=dict(family="Dejavu Sans", size=24)),
+            title=dict(text="diffraction angle, 2<i>θ</i>", font=dict(family="Dejavu Sans", size=24)),
             range=[x_min, x_max],
             tickmode='array',
             tickvals=big_ticks,
@@ -106,7 +106,7 @@ def plot_xrd(patterns, titles, wavelength, experimental_data=None, opacity=0.9):
             zeroline=False
         ),
         yaxis=dict(
-            title=dict(text="Intensity", font=dict(family="Dejavu Sans", size=24)),
+            title=dict(text="intensity, a.u.", font=dict(family="Dejavu Sans", size=24)),
             range=[0, 105],
             gridcolor='lightgray',
             gridwidth=1,
