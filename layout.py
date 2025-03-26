@@ -12,35 +12,47 @@ app.layout = html.Div([
     html.Div([
         html.H2("File Uploads"),
         html.Div([
-            html.H3("Upload .xy File"),
-            dcc.Upload(
-                id="upload-xy",
-                children=html.Div("Drag and drop or click to select a .xy file"),
-                multiple=False,
-                accept=".xy",
-                style={
-                    "border": "1px dashed #ccc",
-                    "padding": "10px",
-                    "margin-bottom": "10px",
-                    "cursor": "pointer"
-                }
-            )
-        ]),
-        html.Div([
-            html.H3("Upload .cif Files"),
-            dcc.Upload(
-                id="upload-cif",
-                children=html.Div("Drag and drop or click to select one or more .cif files"),
-                multiple=True,
-                accept=".cif",
-                style={
-                    "border": "1px dashed #ccc",
-                    "padding": "10px",
-                    "margin-bottom": "10px",
-                    "cursor": "pointer"
-                }
-            )
-        ])
+            html.Div([
+                html.H3("Upload .xy File"),
+                dcc.Upload(
+                    id="upload-xy",
+                    children=html.Div("Drag and drop or click to select a .xy file"),
+                    multiple=False,
+                    accept=".xy",
+                    style={
+                        "border": "1px dashed #ccc",
+                        "padding": "10px",
+                        "cursor": "pointer"
+                    }
+                ),
+                # Span for check mark status when .xy file is uploaded
+                html.Span(id="xy-upload-status", style={
+                    "margin-left": "10px",
+                    "color": "green",
+                    "fontSize": "24px"
+                })
+            ], style={"flex": "1", "margin-right": "10px"}),
+            html.Div([
+                html.H3("Upload .cif Files"),
+                dcc.Upload(
+                    id="upload-cif",
+                    children=html.Div("Drag and drop or click to select one or more .cif files"),
+                    multiple=True,
+                    accept=".cif",
+                    style={
+                        "border": "1px dashed #ccc",
+                        "padding": "10px",
+                        "cursor": "pointer"
+                    }
+                ),
+                # Span for check mark status when at least one .cif file is uploaded
+                html.Span(id="cif-upload-status", style={
+                    "margin-left": "10px",
+                    "color": "green",
+                    "fontSize": "24px"
+                })
+            ], style={"flex": "1", "margin-left": "10px"})
+        ], style={"display": "flex", "flexDirection": "row", "alignItems": "center"})
     ], style={"margin-bottom": "20px"}),
     
     # Dropdown to select a CIF file (populated after upload)
