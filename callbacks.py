@@ -289,10 +289,22 @@ def update_xrd_plot(xy_data, background, opacity, intensity_scaling,
             print("Error in XRD calculation for", file_name, ":", e)
             continue
 
+                # Work on a fresh copy of the original intensities
+        orig_y = list(pattern.y)  # Make a copy of the original intensity array
+        
+        # Apply intensity scaling
         if intensity_scaling is not None and intensity_scaling != 100:
-            pattern.y = [val * (intensity_scaling / 100) for val in pattern.y]
+            scaled_y = [val * (intensity_scaling / 100) for val in orig_y]
+        else:
+            scaled_y = orig_y
+        
+        # Add the background offset (non-cumulatively)
         if background is not None and background > 0:
-            pattern.y = [val + background for val in pattern.y]
+            new_y = [val + background for val in scaled_y]
+        else:
+            new_y = scaled_y
+        
+        pattern.y = new_y
 
         patterns.append(pattern)
         titles.append(file_name)
