@@ -28,7 +28,7 @@ for i in range(1, max_files + 1):
     block = html.Div(
         id=f"lattice-params-{i}",
         style={
-            "position": "relative",  # to allow absolute positioning of the buttons
+            "position": "relative",  # for absolute positioning of buttons
             "border": "1px solid #ccc",
             "padding": "20px",  # increased padding for a bigger window
             "marginBottom": "10px",
@@ -69,54 +69,63 @@ for i in range(1, max_files + 1):
                 )
             ], style={"position": "absolute", "top": "10px", "right": "10px", "display": "flex"}),
             html.H4(id=f"lattice-params-header-{i}", children=f"CIF File {i}", style={"textAlign": "center", "marginTop": "0px"}),
+            # Lattice parameters for each block:
             html.Div([
-                html.Label("a:"),
-                dcc.Input(
-                    id=f"lattice-{i}-a",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
+                # Row for a, b, c:
+                html.Div([
+                    html.Label("a:"),
+                    dcc.Input(
+                        id=f"lattice-{i}-a",
+                        type="number",
+                        style={"width": "100px", "height": "28px", "fontSize": "18px", "margin": "15px"}
+                    )
+                ], style={"display": "inline-block", "marginRight": "10px"}),
+                html.Div([
+                    html.Label("b:"),
+                    dcc.Input(
+                        id=f"lattice-{i}-b",
+                        type="number",
+                        style={"width": "100px", "height": "28px", "fontSize": "18px", "margin": "15px"}
+                    )
+                ], style={"display": "inline-block", "marginRight": "10px"}),
+                html.Div([
+                    html.Label("c:"),
+                    dcc.Input(
+                        id=f"lattice-{i}-c",
+                        type="number",
+                        style={"width": "100px", "height": "28px", "fontSize": "18px", "margin": "15px"}
+                    )
+                ], style={"display": "inline-block", "marginRight": "10px"})
+            ], style={"display": "block"}),
+
+            # New row for α, β, γ:
             html.Div([
-                html.Label("b:"),
-                dcc.Input(
-                    id=f"lattice-{i}-b",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("c:"),
-                dcc.Input(
-                    id=f"lattice-{i}-c",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("α:"),
-                dcc.Input(
-                    id=f"lattice-{i}-alpha",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("β:"),
-                dcc.Input(
-                    id=f"lattice-{i}-beta",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("γ:"),
-                dcc.Input(
-                    id=f"lattice-{i}-gamma",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
+                html.Div([
+                    html.Label("α:"),
+                    dcc.Input(
+                        id=f"lattice-{i}-alpha",
+                        type="number",
+                        style={"width": "100px", "height": "28px", "fontSize": "18px", "margin": "15px"}
+                    )
+                ], style={"display": "inline-block", "marginRight": "10px"}),
+                html.Div([
+                    html.Label("β:"),
+                    dcc.Input(
+                        id=f"lattice-{i}-beta",
+                        type="number",
+                        style={"width": "100px", "height": "28px", "fontSize": "18px", "margin": "15px"}
+                    )
+                ], style={"display": "inline-block", "marginRight": "10px"}),
+                html.Div([
+                    html.Label("γ:"),
+                    dcc.Input(
+                        id=f"lattice-{i}-gamma",
+                        type="number",
+                        style={"width": "100px", "height": "28px", "fontSize": "18px", "margin": "15px"}
+                    )
+                ], style={"display": "inline-block", "marginRight": "10px", "fontSize": "18px"})
+            ], style={"display": "block", "fontSize": "18px"}),
+            # Existing Scaling slider:
             html.Div([
                 html.Label("Scaling (%):"),
                 dcc.Slider(
@@ -128,7 +137,30 @@ for i in range(1, max_files + 1):
                     marks={j: f"{j}%" for j in range(-5, 6)},
                     tooltip={"placement": "bottom", "always_visible": True}
                 )
-            ], style={"marginTop": "20px", "marginBottom": "10px"})
+            ], style={"marginTop": "20px", "marginBottom": "10px", "fontSize": "18px"}),
+            # New per-CIF Intensity and Background controls:
+            html.Div([
+                html.Label("Intensity Scaling (0-100):"),
+                dcc.Input(
+                    id=f"intensity-{i}",
+                    type="number",
+                    value=100,
+                    min=0,
+                    max=100,
+                    style={"width": "100px", "height": "28px", "fontSize": "18px", "margin": "15px"}
+                )
+            ], style={"display": "inline-block", "marginRight": "10px", "fontSize": "18px"}),
+            html.Div([
+                html.Label("Background Level (0-100):"),
+                dcc.Input(
+                    id=f"background-{i}",
+                    type="number",
+                    value=0,
+                    min=0,
+                    max=100,
+                    style={"width": "100px", "height": "28px", "fontSize": "18px", "margin": "15px"}
+                )
+            ], style={"display": "inline-block", "marginRight": "10px", "fontSize": "18px", "fontFamily": "Dejavu Sans"}),
         ]
     )
     lattice_params_blocks.append(block)
@@ -140,6 +172,7 @@ app.layout = html.Div(
         
         # Upload Section for .xy file.
         html.Div([
+            # XY file upload container.
             html.Div([
                 html.Div(
                     dcc.Upload(
@@ -166,11 +199,9 @@ app.layout = html.Div(
                     ),
                     style={"width": "10%", "display": "inline-block", "verticalAlign": "middle"}
                 )
-            ], style={"display": "flex", "width": "100%"})
-        ], style={"width": "50%", "display": "inline-block", "verticalAlign": "top"}),
-        
-        # Upload Section for .cif files.
-        html.Div([
+            ], style={"width": "50%", "display": "inline-block"}),
+            
+            # CIF file upload container.
             html.Div([
                 html.Div(
                     dcc.Upload(
@@ -197,26 +228,13 @@ app.layout = html.Div(
                     ),
                     style={"width": "10%", "display": "inline-block", "verticalAlign": "middle"}
                 )
-            ], style={"display": "flex", "width": "100%"})
-        ], style={"width": "50%", "display": "inline-block", "verticalAlign": "top"}),
+            ], style={"width": "50%", "display": "inline-block"})
+        ], style={"display": "flex", "width": "100%"}),
         
         # Lattice Parameters Container (predefined blocks).
         html.Div(id="lattice-params-container", children=lattice_params_blocks),
         
-        # Other controls.
-        html.Div([
-            html.Div([
-                html.Label("Intensity Scaling (0-100):"),
-                dcc.Input(id="scaling-input", type="number", value=100, min=0, max=100,
-                          style={"width": "120px", "height": "32px", "fontSize": "20px"})
-            ], style={"display": "inline-block", "marginRight": "20px"}),
-            html.Div([
-                html.Label("Background Level (0-100):"),
-                dcc.Input(id="background-input", type="number", value=0, min=0, max=100,
-                          style={"width": "120px", "height": "32px", "fontSize": "20px"})
-            ], style={"display": "inline-block"})
-        ], style={"marginTop": "10px", "marginBottom": "10px"}),
-        
+        # Global Pattern Opacity control remains here.
         html.Div([
             html.Label("Pattern Opacity (0-1):"),
             dcc.Slider(

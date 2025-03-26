@@ -97,7 +97,17 @@ def update_lattice_params_blocks(cif_data):
                 structure = parse_cif(cif_data[file_names[i]])
                 structure = normalize_structure(structure)
                 lattice = structure.lattice
-                style_outputs.append({"display": "block", "position": "relative", "border": "1px solid #ccc", "padding": "20px", "marginBottom": "10px", "fontSize": "24px"})
+                # Set style so that visible blocks are inline-block and 50% wide.
+                style_outputs.append({
+                    "display": "inline-block",
+                    "width": "45%",
+                    "marginRight": "10px",
+                    "position": "relative",
+                    "border": "1px solid #ccc",
+                    "padding": "20px",
+                    "marginBottom": "10px",
+                    "fontSize": "24px"
+                })
                 header_outputs.append(file_names[i])
                 a_outputs.append(round(lattice.a, 4))
                 b_outputs.append(round(lattice.b, 4))
@@ -126,7 +136,6 @@ def update_lattice_params_blocks(cif_data):
             gamma_outputs.append(None)
     
     return style_outputs + header_outputs + a_outputs + b_outputs + c_outputs + alpha_outputs + beta_outputs + gamma_outputs
-
 # ------------------------------------------------------------------
 # Reset Button Callbacks (One per block)
 # ------------------------------------------------------------------
@@ -140,7 +149,7 @@ def make_reset_callback(i):
          Output(f"lattice-{i}-gamma", "value", allow_duplicate=True)],
         Input(f"reset-{i}", "n_clicks"),
         [State("cif-store", "data"),
-        State(f"lattice-params-header-{i}", "children")],
+         State(f"lattice-params-header-{i}", "children")],
         prevent_initial_call='initial_duplicate'
     )
     def reset_block(n_clicks, cif_data, file_name):
@@ -172,7 +181,7 @@ def make_delete_callback(i):
         Output("cif-store", "data", allow_duplicate=True),
         Input(f"delete-{i}", "n_clicks"),
         [State("cif-store", "data"),
-        State(f"lattice-params-header-{i}", "children")],
+         State(f"lattice-params-header-{i}", "children")],
         prevent_initial_call='initial_duplicate'
     )
     def delete_block(n_clicks, cif_data, file_name):
@@ -189,15 +198,13 @@ for i in range(1, 6):
     make_delete_callback(i)
 
 # ------------------------------------------------------------------
-# XRD Plot Callback (Using Dynamic Lattice Parameters)
+# XRD Plot Callback (Using Dynamic Lattice Parameters and per-CIF intensity/background)
 # ------------------------------------------------------------------
 @app.callback(
     Output("xrd-plot", "figure"),
     [
         Input("xy-store", "data"),
-        Input("background-input", "value"),
         Input("opacity-slider", "value"),
-        Input("scaling-input", "value"),
         # Lattice parameter inputs for blocks 1 to 5.
         Input("lattice-1-a", "value"),
         Input("lattice-2-a", "value"),
@@ -233,11 +240,21 @@ for i in range(1, 6):
         Input("lattice-scale-2", "value"),
         Input("lattice-scale-3", "value"),
         Input("lattice-scale-4", "value"),
-        Input("lattice-scale-5", "value")
+        Input("lattice-scale-5", "value"),
+        Input("intensity-1", "value"),
+        Input("intensity-2", "value"),
+        Input("intensity-3", "value"),
+        Input("intensity-4", "value"),
+        Input("intensity-5", "value"),
+        Input("background-1", "value"),
+        Input("background-2", "value"),
+        Input("background-3", "value"),
+        Input("background-4", "value"),
+        Input("background-5", "value")
     ],
     State("cif-store", "data")
 )
-def update_xrd_plot(xy_data, background, opacity, intensity_scaling,
+def update_xrd_plot(xy_data, opacity,
                     a1, a2, a3, a4, a5,
                     b1, b2, b3, b4, b5,
                     c1, c2, c3, c4, c5,
@@ -245,6 +262,8 @@ def update_xrd_plot(xy_data, background, opacity, intensity_scaling,
                     beta1, beta2, beta3, beta4, beta5,
                     gamma1, gamma2, gamma3, gamma4, gamma5,
                     scale1, scale2, scale3, scale4, scale5,
+                    intensity1, intensity2, intensity3, intensity4, intensity5,
+                    background1, background2, background3, background4, background5,
                     cif_data):
     if cif_data is None:
         return {}
@@ -259,6 +278,8 @@ def update_xrd_plot(xy_data, background, opacity, intensity_scaling,
     beta_vals = [beta1, beta2, beta3, beta4, beta5]
     gamma_vals = [gamma1, gamma2, gamma3, gamma4, gamma5]
     scale_vals = [scale1, scale2, scale3, scale4, scale5]
+    intensity_vals = [intensity1, intensity2, intensity3, intensity4, intensity5]
+    background_vals = [background1, background2, background3, background4, background5]
     
     for i in range(num_files):
         file_name = file_names[i]
@@ -289,21 +310,18 @@ def update_xrd_plot(xy_data, background, opacity, intensity_scaling,
             print("Error in XRD calculation for", file_name, ":", e)
             continue
 
-                # Work on a fresh copy of the original intensities
-        orig_y = list(pattern.y)  # Make a copy of the original intensity array
-        
-        # Apply intensity scaling
-        if intensity_scaling is not None and intensity_scaling != 100:
-            scaled_y = [val * (intensity_scaling / 100) for val in orig_y]
+        # Work on a fresh copy of the original intensities
+        orig_y = list(pattern.y)
+        # Apply intensity scaling (per CIF)
+        if intensity_vals[i] is not None and intensity_vals[i] != 100:
+            scaled_y = [val * (intensity_vals[i] / 100) for val in orig_y]
         else:
             scaled_y = orig_y
-        
         # Add the background offset (non-cumulatively)
-        if background is not None and background > 0:
-            new_y = [val + background for val in scaled_y]
+        if background_vals[i] is not None and background_vals[i] > 0:
+            new_y = [val + background_vals[i] for val in scaled_y]
         else:
             new_y = scaled_y
-        
         pattern.y = new_y
 
         patterns.append(pattern)
