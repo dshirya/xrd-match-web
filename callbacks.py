@@ -7,6 +7,34 @@ from preprocess import parse_xy, parse_cif, normalize_structure, XRDCalculator
 from plot import plot_xrd
 from pymatgen.core import Structure
 
+# ------------------------------------------------------------------
+# Check Mark Callbacks for File Uploads
+# ------------------------------------------------------------------
+
+# Update the .xy file upload check mark.
+@app.callback(
+    Output("xy-upload-status", "children"),
+    Input("upload-xy", "contents")
+)
+def update_xy_status(contents):
+    if contents:
+        return "✓"
+    return ""
+
+# Update the .cif file upload check mark.
+@app.callback(
+    Output("cif-upload-status", "children"),
+    Input("upload-cif", "contents")
+)
+def update_cif_status(contents_list):
+    if contents_list:
+        return "✓"
+    return ""
+
+# ------------------------------------------------------------------
+# Store Uploaded Files Callbacks
+# ------------------------------------------------------------------
+
 # Callback to store the uploaded .xy file in a dcc.Store.
 @app.callback(
     Output("xy-store", "data"),
@@ -42,6 +70,10 @@ def store_cif_files(contents_list, filenames):
                 print("Error processing CIF file:", e)
         return cif_data
     return no_update
+
+# ------------------------------------------------------------------
+# Update Dropdown and Lattice Parameter Callbacks
+# ------------------------------------------------------------------
 
 # Callback to update the CIF dropdown based on stored CIF files.
 @app.callback(
@@ -88,6 +120,10 @@ def update_lattice_parameters(selected_cif, scale_value, cif_data):
         return (lattice.a * scale_factor, lattice.b * scale_factor, lattice.c * scale_factor,
                 lattice.alpha, lattice.beta, lattice.gamma, scale_value)
     return lattice.a, lattice.b, lattice.c, lattice.alpha, lattice.beta, lattice.gamma, scale_value or 0
+
+# ------------------------------------------------------------------
+# XRD Plot, Download Link, and CIF Summary Callbacks
+# ------------------------------------------------------------------
 
 # Callback to update the XRD plot.
 @app.callback(
