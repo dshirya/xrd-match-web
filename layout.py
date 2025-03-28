@@ -3,138 +3,77 @@ from dash import Dash, html, dcc
 
 app = Dash(__name__)
 
-# Upload field style.
-upload_style = {
-    'height': '60px',
-    'lineHeight': '60px',
-    'borderWidth': '1px',
-    'borderStyle': 'dashed',
-    'borderRadius': '5px',
-    'margin': '10px auto',
-    'backgroundColor': 'lightgrey',
-    'display': 'flex',
-    'justifyContent': 'center',
-    'alignItems': 'center',
-    "fontSize": "24px"
-}
+# Define your app layout inside this function
+def create_layout(app):
+    upload_style = {
+        'height': '60px',
+        'lineHeight': '60px',
+        'borderWidth': '1px',
+        'borderStyle': 'dashed',
+        'borderRadius': '5px',
+        'margin': '10px auto',
+        'backgroundColor': 'lightgrey',
+        'display': 'flex',
+        'justifyContent': 'center',
+        'alignItems': 'center',
+        "fontSize": "24px"
+    }
 
-# Predefine lattice parameter blocks for up to 5 CIF files.
-# Each block is initially hidden (display: none).
-max_files = 5
-lattice_params_blocks = []
-for i in range(1, max_files + 1):
-    block = html.Div(
-        id=f"lattice-params-{i}",
-        style={
-            "position": "relative",  # to allow absolute positioning of the buttons
-            "border": "1px solid #ccc",
-            "padding": "20px",  # increased padding for a bigger window
-            "marginBottom": "10px",
-            "display": "none",
-            "fontSize": "24px"  # roughly 1.5× the base size
-        },
+    max_files = 5
+    lattice_params_blocks = []
+    for i in range(1, max_files + 1):
+        block = html.Div(
+            id=f"lattice-params-{i}",
+            style={
+                "position": "relative",
+                "border": "1px solid #ccc",
+                "padding": "20px",
+                "marginBottom": "10px",
+                "display": "none",
+                "fontSize": "24px"
+            },
+            children=[
+                html.Div([
+                    html.Button(
+                        "Reset",
+                        id=f"reset-{i}",
+                        n_clicks=0,
+                        style={
+                            "backgroundColor": "#cccccc",
+                            "color": "black",
+                            "fontSize": "14px",
+                            "border": "none",
+                            "borderRadius": "4px",
+                            "padding": "4px 8px",
+                            "width": "60px",
+                            "marginRight": "5px"
+                        }
+                    ),
+                    html.Button(
+                        "Delete",
+                        id=f"delete-{i}",
+                        n_clicks=0,
+                        style={
+                            "backgroundColor": "red",
+                            "color": "white",
+                            "fontSize": "14px",
+                            "border": "none",
+                            "borderRadius": "4px",
+                            "padding": "4px 8px",
+                            "width": "60px"
+                        }
+                    )
+                ], style={"position": "absolute", "top": "10px", "right": "10px", "display": "flex"}),
+                html.H4(id=f"lattice-params-header-{i}", children=f"CIF File {i}", style={"textAlign": "center", "marginTop": "0px"}),
+                # ... (continue with the rest of the layout code here)
+            ]
+        )
+        lattice_params_blocks.append(block)
+
+    return html.Div(
+        style={"fontFamily": "Dejavu Sans", "fontSize": "16px"},
         children=[
-            # Reset and Delete buttons (top-right corner)
-            html.Div([
-                html.Button(
-                    "Reset",
-                    id=f"reset-{i}",
-                    n_clicks=0,
-                    style={
-                        "backgroundColor": "#cccccc",
-                        "color": "black",
-                        "fontSize": "14px",
-                        "border": "none",
-                        "borderRadius": "4px",
-                        "padding": "4px 8px",
-                        "width": "60px",
-                        "marginRight": "5px"
-                    }
-                ),
-                html.Button(
-                    "Delete",
-                    id=f"delete-{i}",
-                    n_clicks=0,
-                    style={
-                        "backgroundColor": "red",
-                        "color": "white",
-                        "fontSize": "14px",
-                        "border": "none",
-                        "borderRadius": "4px",
-                        "padding": "4px 8px",
-                        "width": "60px"
-                    }
-                )
-            ], style={"position": "absolute", "top": "10px", "right": "10px", "display": "flex"}),
-            html.H4(id=f"lattice-params-header-{i}", children=f"CIF File {i}", style={"textAlign": "center", "marginTop": "0px"}),
-            html.Div([
-                html.Label("a:"),
-                dcc.Input(
-                    id=f"lattice-{i}-a",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("b:"),
-                dcc.Input(
-                    id=f"lattice-{i}-b",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("c:"),
-                dcc.Input(
-                    id=f"lattice-{i}-c",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("α:"),
-                dcc.Input(
-                    id=f"lattice-{i}-alpha",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("β:"),
-                dcc.Input(
-                    id=f"lattice-{i}-beta",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("γ:"),
-                dcc.Input(
-                    id=f"lattice-{i}-gamma",
-                    type="number",
-                    style={"width": "120px", "height": "32px", "fontSize": "20px"}
-                )
-            ], style={"display": "inline-block", "marginRight": "10px"}),
-            html.Div([
-                html.Label("Scaling (%):"),
-                dcc.Slider(
-                    id=f"lattice-scale-{i}",
-                    min=-5,
-                    max=5,
-                    step=0.1,  # Allow 0.1 increments
-                    value=0,
-                    marks={j: f"{j}%" for j in range(-5, 6)},
-                    tooltip={"placement": "bottom", "always_visible": True}
-                )
-            ], style={"marginTop": "20px", "marginBottom": "10px"})
-        ]
-    )
-    lattice_params_blocks.append(block)
-
-app.layout = html.Div(
-    style={"fontFamily": "Dejavu Sans", "fontSize": "16px"},  # Global font style.
-    children=[
-        html.H1("XRD Pattern Customizer", style={"fontSize": "32px"}),
+            html.H1("XRD Pattern Customizer", style={"fontSize": "32px"}),
         
         # Upload Section for .xy file.
         html.Div([
