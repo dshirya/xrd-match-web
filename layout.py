@@ -1,4 +1,9 @@
+import dash
 from dash import html, dcc
+
+# Initialize the Dash app.
+app = dash.Dash(__name__)
+server = app.server
 
 def get_layout():
     # Upload field style.
