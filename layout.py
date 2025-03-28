@@ -166,7 +166,7 @@ def get_layout():
         )
         lattice_params_blocks.append(block)
 
-    layout = html.Div(
+    app.layout = html.Div(
         style={"fontFamily": "Dejavu Sans", "fontSize": "16px"},
         children=[
             html.H1("XRD Pattern Customizer", style={"fontSize": "32px"}),
