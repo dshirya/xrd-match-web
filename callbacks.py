@@ -29,165 +29,103 @@ def register_callbacks(app):
             return "✓"
         return ""
 
-# ------------------------------------------------------------------
-# Store Uploaded Files Callbacks
-# ------------------------------------------------------------------
-@app.callback(
-    Output("xy-store", "data"),
-    Input("upload-xy", "contents"),
-    State("upload-xy", "filename")
-)
-def store_xy_file(contents, filename):
-    if contents is not None:
-        try:
-            df = parse_xy(contents)
-            max_intensity = df['intensity'].max()
-            df['intensity'] = (df['intensity'] / max_intensity) * 100
-            return df.to_json(date_format='iso', orient='split')
-        except Exception as e:
-            print("Error processing XY file:", e)
-            return no_update
-    return no_update
-
-@app.callback(
-    Output("cif-store", "data"),
-    Input("upload-cif", "contents"),
-    State("upload-cif", "filename")
-)
-def store_cif_files(contents_list, filenames):
-    if contents_list is not None:
-        cif_data = {}
-        for contents, name in zip(contents_list, filenames):
-            try:
-                cif_data[name] = contents
-            except Exception as e:
-                print("Error processing CIF file:", e)
-        return cif_data
-    return no_update
-
-# ------------------------------------------------------------------
-# Lattice Parameter Blocks Update Callback
-# ------------------------------------------------------------------
-@app.callback(
-    [Output(f"lattice-params-{i}", "style") for i in range(1, 6)] +
-    [Output(f"lattice-params-header-{i}", "children") for i in range(1, 6)] +
-    [Output(f"lattice-{i}-a", "value") for i in range(1, 6)] +
-    [Output(f"lattice-{i}-b", "value") for i in range(1, 6)] +
-    [Output(f"lattice-{i}-c", "value") for i in range(1, 6)] +
-    [Output(f"lattice-{i}-alpha", "value") for i in range(1, 6)] +
-    [Output(f"lattice-{i}-beta", "value") for i in range(1, 6)] +
-    [Output(f"lattice-{i}-gamma", "value") for i in range(1, 6)],
-    Input("cif-store", "data")
-)
-def update_lattice_params_blocks(cif_data):
-    style_outputs = []
-    header_outputs = []
-    a_outputs = []
-    b_outputs = []
-    c_outputs = []
-    alpha_outputs = []
-    beta_outputs = []
-    gamma_outputs = []
-    
-    file_names = sorted(cif_data.keys()) if cif_data else []
-    num_files = len(file_names)
-    
-    for i in range(5):
-        if i < num_files:
-            try:
-                structure = parse_cif(cif_data[file_names[i]])
-                structure = normalize_structure(structure)
-                lattice = structure.lattice
-                style_outputs.append({"display": "block", "position": "relative", "border": "1px solid #ccc", "padding": "20px", "marginBottom": "10px", "fontSize": "24px"})
-                header_outputs.append(file_names[i])
-                a_outputs.append(round(lattice.a, 4))
-                b_outputs.append(round(lattice.b, 4))
-                c_outputs.append(round(lattice.c, 4))
-                alpha_outputs.append(round(lattice.alpha, 4))
-                beta_outputs.append(round(lattice.beta, 4))
-                gamma_outputs.append(round(lattice.gamma, 4))
-            except Exception as e:
-                print("Error parsing CIF for lattice block:", e)
-                style_outputs.append({"display": "none"})
-                header_outputs.append("")
-                a_outputs.append(None)
-                b_outputs.append(None)
-                c_outputs.append(None)
-                alpha_outputs.append(None)
-                beta_outputs.append(None)
-                gamma_outputs.append(None)
-        else:
-            style_outputs.append({"display": "none"})
-            header_outputs.append("")
-            a_outputs.append(None)
-            b_outputs.append(None)
-            c_outputs.append(None)
-            alpha_outputs.append(None)
-            beta_outputs.append(None)
-            gamma_outputs.append(None)
-    
-    return style_outputs + header_outputs + a_outputs + b_outputs + c_outputs + alpha_outputs + beta_outputs + gamma_outputs
-
-# ------------------------------------------------------------------
-# Reset Button Callbacks (One per block)
-# ------------------------------------------------------------------
-def make_reset_callback(i):
+    # ------------------------------------------------------------------
+    # Store Uploaded Files Callbacks
+    # ------------------------------------------------------------------
     @app.callback(
-        [Output(f"lattice-{i}-a", "value", allow_duplicate=True),
-         Output(f"lattice-{i}-b", "value", allow_duplicate=True),
-         Output(f"lattice-{i}-c", "value", allow_duplicate=True),
-         Output(f"lattice-{i}-alpha", "value", allow_duplicate=True),
-         Output(f"lattice-{i}-beta", "value", allow_duplicate=True),
-         Output(f"lattice-{i}-gamma", "value", allow_duplicate=True)],
-        Input(f"reset-{i}", "n_clicks"),
-        [State("cif-store", "data"),
-        State(f"lattice-params-header-{i}", "children")],
-        prevent_initial_call='initial_duplicate'
+        Output("xy-store", "data"),
+        Input("upload-xy", "contents"),
+        State("upload-xy", "filename")
     )
-    def reset_block(n_clicks, cif_data, file_name):
+    def store_xy_file(contents, filename):
+        if contents is not None:
+            try:
+                df = parse_xy(contents)
+                max_intensity = df['intensity'].max()
+                df['intensity'] = (df['intensity'] / max_intensity) * 100
+                return df.to_json(date_format='iso', orient='split')
+            except Exception as e:
+                print("Error processing XY file:", e)
+                return no_update
+        return no_update
+
+    @app.callback(
+        Output("cif-store", "data"),
+        Input("upload-cif", "contents"),
+        State("upload-cif", "filename")
+    )
+    def store_cif_files(contents_list, filenames):
+        if contents_list is not None:
+            cif_data = {}
+            for contents, name in zip(contents_list, filenames):
+                try:
+                    cif_data[name] = contents
+                except Exception as e:
+                    print("Error processing CIF file:", e)
+            return cif_data
+        return no_update
+
+    # ------------------------------------------------------------------
+    # Reset Button Callbacks
+    # ------------------------------------------------------------------
+    # Helper function for resetting lattice parameters
+    def reset_lattice_params(cif_data, file_name):
         if not cif_data or not file_name:
-            return no_update, no_update, no_update, no_update, no_update, no_update
+            return [no_update] * 6
         try:
             structure = parse_cif(cif_data[file_name])
             structure = normalize_structure(structure)
             lattice = structure.lattice
-            return (round(lattice.a, 4),
-                    round(lattice.b, 4),
-                    round(lattice.c, 4),
-                    round(lattice.alpha, 4),
-                    round(lattice.beta, 4),
-                    round(lattice.gamma, 4))
+            return [
+                round(lattice.a, 4),
+                round(lattice.b, 4),
+                round(lattice.c, 4),
+                round(lattice.alpha, 4),
+                round(lattice.beta, 4),
+                round(lattice.gamma, 4),
+            ]
         except Exception as e:
-            print("Error in reset callback for", file_name, ":", e)
-            return no_update, no_update, no_update, no_update, no_update, no_update
-    return reset_block
+            print(f"Error in reset callback for {file_name}: {e}")
+            return [no_update] * 6
 
-for i in range(1, 6):
-    make_reset_callback(i)
-
-# ------------------------------------------------------------------
-# Delete Button Callbacks (One per block)
-# ------------------------------------------------------------------
-def make_delete_callback(i):
-    @app.callback(
-        Output("cif-store", "data", allow_duplicate=True),
-        Input(f"delete-{i}", "n_clicks"),
-        [State("cif-store", "data"),
-        State(f"lattice-params-header-{i}", "children")],
-        prevent_initial_call='initial_duplicate'
-    )
-    def delete_block(n_clicks, cif_data, file_name):
+    # Helper function for deleting CIF data
+    def delete_cif_data(cif_data, file_name):
         if not cif_data or not file_name:
             return no_update
-        if n_clicks and file_name in cif_data:
+        if file_name in cif_data:
             new_data = cif_data.copy()
             new_data.pop(file_name)
             return new_data
         return cif_data
-    return delete_block
 
-for i in range(1, 6):
-    make_delete_callback(i)
+    # Create reset callbacks dynamically
+    for i in range(1, 6):
+        @app.callback(
+            [
+                Output(f"lattice-{i}-a", "value", allow_duplicate=True),
+                Output(f"lattice-{i}-b", "value", allow_duplicate=True),
+                Output(f"lattice-{i}-c", "value", allow_duplicate=True),
+                Output(f"lattice-{i}-alpha", "value", allow_duplicate=True),
+                Output(f"lattice-{i}-beta", "value", allow_duplicate=True),
+                Output(f"lattice-{i}-gamma", "value", allow_duplicate=True),
+            ],
+            Input(f"reset-{i}", "n_clicks"),
+            [State("cif-store", "data"), State(f"lattice-params-header-{i}", "children")],
+            prevent_initial_call="initial_duplicate",
+        )
+        def reset_callback(n_clicks, cif_data, file_name, i=i):
+            return reset_lattice_params(cif_data, file_name)
+
+    # Create delete callbacks dynamically
+    for i in range(1, 6):
+        @app.callback(
+            Output("cif-store", "data", allow_duplicate=True),
+            Input(f"delete-{i}", "n_clicks"),
+            [State("cif-store", "data"), State(f"lattice-params-header-{i}", "children")],
+            prevent_initial_call="initial_duplicate",
+        )
+        def delete_callback(n_clicks, cif_data, file_name, i=i):
+            return delete_cif_data(cif_data, file_name)
 
 # ------------------------------------------------------------------
 # XRD Plot Callback (Using Dynamic Lattice Parameters)
