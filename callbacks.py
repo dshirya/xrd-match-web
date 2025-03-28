@@ -7,26 +7,27 @@ from preprocess import parse_xy, parse_cif, normalize_structure, XRDCalculator
 from plot import plot_xrd
 from pymatgen.core import Structure
 
-# ------------------------------------------------------------------
-# File Upload Check Mark Callbacks
-# ------------------------------------------------------------------
-@app.callback(
-    Output("xy-upload-status", "children"),
-    Input("upload-xy", "contents")
-)
-def update_xy_status(contents):
-    if contents:
-        return "✓"
-    return ""
+def register_callbacks(app):
+    # ------------------------------------------------------------------
+    # File Upload Check Mark Callbacks
+    # ------------------------------------------------------------------
+    @app.callback(
+        Output("xy-upload-status", "children"),
+        Input("upload-xy", "contents")
+    )
+    def update_xy_status(contents):
+        if contents:
+            return "✓"
+        return ""
 
-@app.callback(
-    Output("cif-upload-status", "children"),
-    Input("upload-cif", "contents")
-)
-def update_cif_status(contents_list):
-    if contents_list:
-        return "✓"
-    return ""
+    @app.callback(
+        Output("cif-upload-status", "children"),
+        Input("upload-cif", "contents")
+    )
+    def update_cif_status(contents_list):
+        if contents_list:
+            return "✓"
+        return ""
 
 # ------------------------------------------------------------------
 # Store Uploaded Files Callbacks

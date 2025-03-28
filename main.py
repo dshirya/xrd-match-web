@@ -2,6 +2,7 @@ import callbacks
 from layout import create_layout
 import dash
 import os
+from callbacks import register_callbacks
 
 # Initialize Dash app
 app = dash.Dash(__name__)
