@@ -1,6 +1,7 @@
 import dash
 from dash import Dash, html, dcc
 from callbacks import register_callbacks
+from app import app
 
 app = Dash(__name__)
 

@@ -1,5 +1,6 @@
 import os
 import dash
+from app import app, server
 from layout import create_layout
 from callbacks import register_callbacks
 

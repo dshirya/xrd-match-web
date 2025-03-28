@@ -6,6 +6,7 @@ from layout import app
 from preprocess import parse_xy, parse_cif, normalize_structure, XRDCalculator
 from plot import plot_xrd
 from pymatgen.core import Structure
+from app import app
 
 def register_callbacks(app):
     # ------------------------------------------------------------------
