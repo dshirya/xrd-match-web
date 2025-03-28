@@ -246,7 +246,7 @@ app.layout = html.Div(
                 marks={i/10: str(i/10) for i in range(11)},
                 tooltip={"placement": "bottom", "always_visible": True}
             )
-        ], style={"marginTop": "10px", "marginBottom": "10px"}),
+        ], style={"marginTop": "10px", "marginBottom": "10px", "fontSize": "18px"}),
         
         # Download Plot button.
         html.Div([

@@ -6,6 +6,7 @@ from layout import app
 from preprocess import parse_xy, parse_cif, normalize_structure, XRDCalculator
 from plot import plot_xrd
 from pymatgen.core import Structure
+import plotly.io as pio
 
 # ------------------------------------------------------------------
 # File Upload Check Mark Callbacks
@@ -353,7 +354,7 @@ def update_download_link(figure):
     if not figure:
         return ""
     try:
-        import plotly.io as pio
+        
         fig = go.Figure(figure)
         fig.update_layout(
             width=1800,
