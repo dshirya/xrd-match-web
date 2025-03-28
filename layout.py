@@ -1,5 +1,7 @@
 from dash import html, dcc
 
+app = Dash(__name__)
+
 # Upload field style.
 upload_style = {
     'height': '60px',
