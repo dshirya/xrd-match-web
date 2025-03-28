@@ -1,6 +1,5 @@
 import callbacks  
 from layout import create_layout
-from callbacks import register_callbacks
 import dash
 import os
 

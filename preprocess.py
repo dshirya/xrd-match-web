@@ -143,9 +143,10 @@ def parse_xy(contents):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     s = StringIO(decoded.decode('utf-8'))
-    df = pd.read_csv(s, sep='\s+', header=None)
+    df = pd.read_csv(s, sep=r'\s+', header=None)  # Use a raw string for the separator
     df.columns = ['2_theta', 'intensity']
     return df
+
 
 def parse_cif(contents):
     """
