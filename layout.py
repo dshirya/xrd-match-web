@@ -1,9 +1,3 @@
-import dash
-from dash import html, dcc
-
-# Initialize the Dash app.
-app = dash.Dash(__name__)
-server = app.server
 
 # Upload field style.
 upload_style = {
@@ -261,5 +255,3 @@ app.layout = html.Div(
     ]
 )
 
-if __name__ == "__main__":
-    app.run_server(debug=True)
