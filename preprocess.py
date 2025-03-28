@@ -34,7 +34,7 @@ class XRDCalculator(AbstractDiffractionPatternCalculator):
             self.radiation = wavelength
             self.wavelength = WAVELENGTHS[wavelength]
         else:
-            raise TypeError(f"{type(wavelength)} must be either float, int, or str")
+            raise TypeError(f"{type(wavelength)=} must be either float, int or str")
         self.symprec = symprec
         self.debye_waller_factors = debye_waller_factors or {}
 
@@ -143,10 +143,9 @@ def parse_xy(contents):
     content_type, content_string = contents.split(',')
     decoded = base64.b64decode(content_string)
     s = StringIO(decoded.decode('utf-8'))
-    df = pd.read_csv(s, sep=r'\s+', header=None)  # Use a raw string for the separator
+    df = pd.read_csv(s, sep='\s+', header=None)
     df.columns = ['2_theta', 'intensity']
     return df
-
 
 def parse_cif(contents):
     """
