@@ -1,5 +1,5 @@
 from layout import app
-import callbacks  # This registers all callbacks with the app
+import callbacks  
 
 server = app.server  
 
